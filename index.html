@@ -16,6 +16,10 @@
     #debug { color: #c62828; margin-top: 18px; min-height: 22px; white-space: pre-wrap; }
     footer { margin-top: 36px; font-size: 12px; color: #666; }
   </style>
+
+  <!-- ✅ Correct script tags -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.7.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.6/dist/teachablemachine-image.min.js"></script>
 </head>
 <body>
   <h1>AI Object Recognition</h1>
@@ -29,41 +33,36 @@
   <div id="label-container"></div>
   <div id="debug"></div>
 
-  <!-- ✅ Correct script tags -->
-  
- <!-- Load TensorFlow.js and Teachable Machine libraries -->
- <script/cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js</script>
-
-
   <script>
-    const MODEL_URL = "./"; // All files are in the same folder as index.html
+    const MODEL_URL = "https://teachablemachine.withgoogle.com/models/hMnWOx36S/";
+
     let model, webcam, labelContainer, maxPredictions, running = false;
 
     const debugEl = document.getElementById("debug");
     const startBtn = document.getElementById("start");
 
+    function debug(msg) {
+      console.log(msg);
+      debugEl.textContent = msg;
+    }
+
     startBtn.addEventListener("click", async () => {
       if (running) return;
       startBtn.disabled = true;
-      debug("Loading model...");
+      debug("Loading hosted model from: " + MODEL_URL);
 
       try {
-        // Load model and metadata
         model = await tmImage.load(MODEL_URL + "model.json", MODEL_URL + "metadata.json");
         maxPredictions = model.getTotalClasses();
         debug("Model loaded ✅. Classes: " + maxPredictions);
 
-        // Setup webcam with user gesture
-        webcam = new tmImage.Webcam(400, 300, true); // width, height, flip
-        debug("Requesting camera access...");
-        await webcam.setup(); // Prompts for permission
-        debug("Starting webcam...");
+        webcam = new tmImage.Webcam(400, 300, true);
+        await webcam.setup();
         await webcam.play();
         document.getElementById("webcam-container").appendChild(webcam.canvas);
 
-        // Prepare labels and bars
         labelContainer = document.getElementById("label-container");
-        labelContainer.innerHTML = ""; // reset
+        labelContainer.innerHTML = "";
         for (let i = 0; i < maxPredictions; i++) {
           const row = document.createElement("div");
           const label = document.createElement("div");
@@ -78,7 +77,7 @@
         }
 
         running = true;
-        window.requestAnimationFrame(loop);
+        requestAnimationFrame(loop);
         debug("Webcam ready ✅. Predicting...");
       } catch (err) {
         console.error(err);
@@ -91,7 +90,7 @@
       if (!running) return;
       webcam.update();
       await predict();
-      window.requestAnimationFrame(loop);
+      requestAnimationFrame(loop);
     }
 
     async function predict() {
@@ -106,16 +105,11 @@
         barFill.style.width = `${Math.round(prob * 100)}%`;
       }
     }
-
-    function debug(msg) {
-      debugEl.textContent = msg;
-    }
   </script>
 
   <footer>
-    If the camera prompt doesn’t appear, click the lock icon in the address bar and allow camera access.  
-    File names required: <code>model.json</code>, <code>metadata.json</code>, <code>weights.bin</code>.
+    If the camera prompt doesn’t appear, click the lock icon in the address bar and allow camera access.
+    Using hosted URL: no local files required.
   </footer>
 </body>
 </html>
-

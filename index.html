@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Object Recognition Demo</title>
+  <style>
+    body { text-align: center; font-family: Arial; }
+    #webcam-container { margin-top: 20px; }
+    #label-container div { font-size: 18px; margin: 5px; }
+  </style>
+</head>
+<body>
+  <h1>AI Object Recognition</h1>
+  <p>Show an object to the webcam and see what AI predicts!</p>
+  <div id="webcam-container"></div>
+  <div id="label-container"></div>
+
+  <!-- Load TensorFlow.js and Teachable Machine libraries -->
+  https://cdn.jsdelivr.net/npm/@tensorflow/tfjs
+  <script src="https://cdn.jsdelivr.net/npm/@teachable</script>
+
+  <script>
+    const URL = "https://yourusername.github.io/object-recognition-demo/"; // Replace with your GitHub Pages URL
+    let model, webcam, labelContainer, maxPredictions;
+
+    async function init() {
+      model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+      maxPredictions = model.getTotalClasses();
+
+      webcam = new tmImage.Webcam(200, 200, true);
+      await webcam.setup();
+      await webcam.play();
+      document.getElementById("webcam-container").appendChild(webcam.canvas);
+
+      labelContainer = document.getElementById("label-container");
+      for (let i = 0; i < maxPredictions; i++) {
+        labelContainer.appendChild(document.createElement("div"));
+      }
+      loop();
+    }
+
+    async function loop() {
+      webcam.update();
+      await predict();
+      requestAnimationFrame(loop);
+    }
+
+    async function predict() {
+      const prediction = await model.predict(webcam.canvas);
+      for (let i = 0; i < maxPredictions; i++) {
+        const classPrediction = prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+        labelContainer.childNodes[i].innerHTML = classPrediction;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

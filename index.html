@@ -14,18 +14,21 @@
   <p>Show an object to the webcam and see what AI predicts!</p>
   <div id="webcam-container"></div>
   <div id="label-container"></div>
+  <div id="debug" style="color:red; margin-top:20px;"></div>
 
-  <script src="https://cdn.jsdelivrsorflow/tfjs</script>
-  <script src="https://cdn.jsdelivrchablemachine/image</script>
+  <script src="https://cdn/npm/@tensorflow/tfjs</script>
+  <script src="https://cdn.jsdelivr.netlemachine/image</script>
 
   <script>
-    const URL = "./"; // Change to "./model/" if files are in a folder named model
+    const URL = "./"; // All files are in root
     let model, webcam, labelContainer, maxPredictions;
 
     async function init() {
       try {
+        document.getElementById("debug").innerText = "Loading model...";
         model = await tmImage.load(URL + "model.json", URL + "metadata.json");
         maxPredictions = model.getTotalClasses();
+        document.getElementById("debug").innerText = "Model loaded successfully!";
 
         webcam = new tmImage.Webcam(200, 200, true);
         await webcam.setup();
@@ -38,8 +41,8 @@
         }
         loop();
       } catch (error) {
-        console.error("Error loading model:", error);
-        document.body.innerHTML += "<p style='color:red;'>Failed to load model. Check URL and file structure.</p>";
+        console.error(error);
+        document.getElementById("debug").innerText = "Error: " + error.message;
       }
     }
 

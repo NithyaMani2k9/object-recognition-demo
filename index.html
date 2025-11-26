@@ -16,27 +16,31 @@
   <div id="label-container"></div>
 
   <!-- Load TensorFlow.js and Teachable Machine libraries -->
-  https://cdn.jsdelivr.net/npm/@tensorflow/tfjs
-  <script src="https://cdn.jsdelivr.net/npm/@teachable</script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjsttps://cdn.jsdelivr.net/npm/@teachablemachine/image</script>
 
   <script>
-    const URL = "https://nithyamani2k9.github.io/object-recognition-demo/"; // Replace with your GitHub Pages URL
+    const URL = "./"; // Change to "./model/" if files are in a folder named model
     let model, webcam, labelContainer, maxPredictions;
 
     async function init() {
-      model = await tmImage.load(URL + "model.json", URL + "metadata.json");
-      maxPredictions = model.getTotalClasses();
+      try {
+        model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+        maxPredictions = model.getTotalClasses();
 
-      webcam = new tmImage.Webcam(200, 200, true);
-      await webcam.setup();
-      await webcam.play();
-      document.getElementById("webcam-container").appendChild(webcam.canvas);
+        webcam = new tmImage.Webcam(200, 200, true);
+        await webcam.setup();
+        await webcam.play();
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
 
-      labelContainer = document.getElementById("label-container");
-      for (let i = 0; i < maxPredictions; i++) {
-        labelContainer.appendChild(document.createElement("div"));
+        labelContainer = document.getElementById("label-container");
+        for (let i = 0; i < maxPredictions; i++) {
+          labelContainer.appendChild(document.createElement("div"));
+        }
+        loop();
+      } catch (error) {
+        console.error("Error loading model:", error);
+        document.body.innerHTML += "<p style='color:red;'>Failed to load model. Check URL and file structure.</p>";
       }
-      loop();
     }
 
     async function loop() {
@@ -57,4 +61,3 @@
   </script>
 </body>
 </html>
-
